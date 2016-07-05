@@ -1,4 +1,6 @@
-package ru.vetclinic.clinic;
+package ru.vetclinic.clinic.Pets;
+
+import ru.vetclinic.clinic.Client;
 
 /**
  * Питомец клиента ветеринарной клиники

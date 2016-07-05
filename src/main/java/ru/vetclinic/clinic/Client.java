@@ -1,5 +1,7 @@
 package ru.vetclinic.clinic;
 
+import ru.vetclinic.clinic.Pets.Pet;
+
 import javax.persistence.*;
 import java.io.Serializable;
 

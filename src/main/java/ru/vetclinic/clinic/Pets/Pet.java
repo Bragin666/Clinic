@@ -13,6 +13,11 @@ public interface Pet {
     int getId();
 
     /**
+     * Возвращает тип животного
+     * */
+    String getPetType();
+
+    /**
      * Возвращает кличку питомца
      */
     String getName();
@@ -29,7 +34,12 @@ public interface Pet {
     Client getOwner();
 
     /**
+     * Устанавливает хозяина питомца
+     */
+    void setOwner(Client client);
+
+    /**
      * Подать голос
      */
-    void makeSound();
+    String makeSound();
 }

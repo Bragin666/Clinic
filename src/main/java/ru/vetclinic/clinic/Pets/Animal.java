@@ -1,43 +1,52 @@
 package ru.vetclinic.clinic.Pets;
 
 import ru.vetclinic.clinic.Client;
+import ru.vetclinic.clinic.IDGenerator;
 
 /**
  * Абстрактный класс Животное, реализующий методы интерфеса Питомец
  * Created by Djony on 05.07.2016.
  */
-public abstract class Animal implements Pet {
+abstract class Animal implements Pet {
     /** Идентификационный номер животного */
-    private final int id;
-    /** Кличка кошки */
+    private int id;
+    /** Тип животного */
+    String petType;
+    /** Кличка животного */
     private String name;
-    /** Вдажелец кошки */
-    private final Client owner;
+    /** Хозяин животного */
+    private Client owner;
 
     /**
      * Конструктор животного
-     * @param id Идентификационный номер
      * @param owner Владелец
      * @param name Кличка
      */
-    public Animal(int id, Client owner, String name) {
-        this.id = id;
+    Animal(Client owner, String name) {
+        this.id = IDGenerator.getPetId();
         this.owner = owner;
         this.name = name;
+        if (owner != null) owner.addPet(this);
     }
 
     /**
      * Возвращает идентификационный номер питомца
+     * @return
      */
     public int getId() {
-        return 0;
+        return id;
+    }
+
+    /** Возвращает тип животного */
+    public String getPetType() {
+        return petType;
     }
 
     /**
      * Возвращает кличку питомца
      */
     public String getName() {
-        return null;
+        return name;
     }
 
     /**
@@ -46,18 +55,26 @@ public abstract class Animal implements Pet {
      * @param name Новая кличка питомца
      */
     public void setName(String name) {
-
+        this.name = name;
     }
 
     /**
      * Возвращает хозяина питомца
      */
     public Client getOwner() {
-        return null;
+        return owner;
     }
+
+    /** Изменяеи хозяина */
+    public void setOwner(Client client) {this.owner = client; }
 
     /**
      * Подать голос
      */
-    public abstract void makeSound();
+    public abstract String makeSound();
+
+    @Override
+    public String toString() {
+        return "id = " + id + ", petType + " + petType + ", name = " + name + ", owner = " + owner.getId();
+    }
 }

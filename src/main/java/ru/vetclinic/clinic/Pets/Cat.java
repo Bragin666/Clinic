@@ -9,19 +9,18 @@ import ru.vetclinic.clinic.Client;
 public class Cat extends Animal {
     /**
      * Конструктор кошки
-     * @param id Идентификационный номер
      * @param owner Хозяин, владелец, клиент ветеринарной клиники
      * @param name Кличка
      */
-    public Cat(int id, Client owner, String name) {
-        super(id, owner, name);
-        owner.setPet(this);
+    public Cat(Client owner, String name) {
+        super(owner, name);
+        this.petType = "cat";
     }
 
     /**
      * Подать голос
      */
-    public void makeSound() {
-        System.out.println("Miu-miu");
+    public String makeSound() {
+        return "Miu-miu";
     }
 }

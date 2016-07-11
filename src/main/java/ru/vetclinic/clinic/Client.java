@@ -4,30 +4,27 @@ import ru.vetclinic.clinic.Pets.Pet;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Клиент ветеринарной клиники, владелец домашнего питомца
  * Created by Djony on 15.06.2016.
  */
-@Entity
 public class Client implements Serializable {
-    /** Идентификационнный номер клиента */
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    /** Идентификационный номер клиента */
     private int id;
     /** Имя клиента */
     private String name;
     /** Питомец */
-    @Transient
-    private Pet pet;
-
-    public Client() {}
+    private Set<Pet> pets = new HashSet<Pet>();
 
     /**
      * Основной конструктор класса
      * @param name Имя клиента
      */
     public Client(String name) {
+        this.id = IDGenerator.getClientId();
         this.name = name;
     }
 
@@ -56,18 +53,34 @@ public class Client implements Serializable {
     }
 
     /**
-     * Возвращает питомца
+     * Возвращает всех питомцев
      * @return Питомец
      */
-    public Pet getPet() {
-        return pet;
+    public Set<Pet> getPets() {
+        return pets;
     }
 
     /**
-     * Возвращает питомца
+     * Добавляет нового питомца питомца
      * @param pet Питомец
      */
-    public void setPet(final Pet pet) {
-        this.pet = pet;
+    public void addPet(final Pet pet) {
+        pets.add(pet);
+    }
+
+    /**
+     * Удалеет питомца у клиента
+     * @param pet Питомец
+     */
+    public void removePet(Pet pet) {
+        pets.remove(pet);
+    }
+
+    @Override
+    public String toString() {
+        String s = "id= " + id + ", name= " + name + "\nPets :";
+        for (Pet pet : pets) s = s + "\n   " + "id = " + pet.getId() + ", petType = " + pet.getPetType()
+                + ", name = " + pet.getName();
+        return  s;
     }
 }

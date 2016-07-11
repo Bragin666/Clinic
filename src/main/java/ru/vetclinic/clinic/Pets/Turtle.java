@@ -9,19 +9,18 @@ import ru.vetclinic.clinic.Client;
 public class Turtle extends Animal {
     /**
      * Конструктор черепахи
-     * @param id Идентификационный номер
      * @param owner Владелец
      * @param name Кличка
      */
-    public Turtle(int id, Client owner, String name) {
-        super(id, owner, name);
-        owner.setPet(this);
+    public Turtle(Client owner, String name) {
+        super(owner, name);
+        this.petType = "turtle";
     }
 
     /**
      * Подать голос
      */
-    public void makeSound() {
-        System.out.println("Bul-bul");
+    public String makeSound() {
+        return "Bul-bul";
     }
 }

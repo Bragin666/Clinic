@@ -75,6 +75,7 @@ abstract class Animal implements Pet {
 
     @Override
     public String toString() {
-        return "id = " + id + ", petType + " + petType + ", name = " + name + ", owner = " + owner.getId();
+        return "id = " + id + ", petType = " + petType + ", name = " + name + ", owner = " +
+                (owner == null ? "null" : owner.getId());
     }
 }

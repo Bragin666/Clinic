@@ -22,7 +22,7 @@ class Clinic {
     /** Список всех доступных видом животных */
     private final HashMap<String, Class> availablePets = new HashMap<String, Class>();
 
-    
+
     /** Конструктор */
     Clinic() {
         this.loadNewOperation("quit", new QuitOperation());
@@ -48,7 +48,7 @@ class Clinic {
      * Выполняет операцию
      * @param words Слова
      * @return Текс или сообщение
-     * @throws MyException РАзличные исключения
+     * @throws MyException Различные исключения
      */
     public String doOperation(String[] words) throws MyException {
         String message = "";
@@ -210,8 +210,12 @@ class Clinic {
         public String doOperation(String[] words) throws MyException {
             if (!(words.length == 4)) throw new IncorrectDataEntryException();
 
-            int clientId = Clinic.this.parseInt(words[1]);
-            Client client = Clinic.this.getClient(clientId);
+            Client client;
+            if (words[1].equals("null")) client = null;
+            else {
+                int clientId = Clinic.this.parseInt(words[1]);
+                client = Clinic.this.getClient(clientId);
+            }
             if (!clients.contains(client)) throw new ClientDoesntExistException();
 
             String petType = words[2];

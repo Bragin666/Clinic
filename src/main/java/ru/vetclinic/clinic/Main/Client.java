@@ -1,8 +1,8 @@
-package ru.vetclinic.clinic;
+package ru.vetclinic.clinic.Main;
 
+import ru.vetclinic.clinic.Temperal.IDGenerator;
 import ru.vetclinic.clinic.Pets.Pet;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -78,9 +78,25 @@ public class Client implements Serializable {
 
     @Override
     public String toString() {
-        String s = "id= " + id + ", name= " + name + "\nPets :";
-        for (Pet pet : pets) s = s + "\n   " + "id = " + pet.getId() + ", petType = " + pet.getPetType()
+        String s = "name= " + name + "\nPets :";
+        for (Pet pet : pets) s = s + "\n   " + "petType = " + pet.getPetType()
                 + ", name = " + pet.getName();
         return  s;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Client)) return false;
+
+        Client client = (Client) o;
+
+        return getName() != null ? getName().equals(client.getName()) : client.getName() == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return getName() != null ? getName().hashCode() : 0;
     }
 }

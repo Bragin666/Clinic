@@ -1,7 +1,7 @@
 package ru.vetclinic.clinic.Pets;
 
 import org.junit.Test;
-import ru.vetclinic.clinic.Client;
+import ru.vetclinic.clinic.Main.Client;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;

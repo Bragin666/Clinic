@@ -1,4 +1,4 @@
-package ru.vetclinic.clinic;
+package ru.vetclinic.clinic.Main;
 
 import ru.vetclinic.clinic.Exceptions.*;
 import ru.vetclinic.clinic.Pets.Cat;
@@ -11,7 +11,7 @@ import java.util.*;
 /**
  * Ветеренарная клиника
  */
-class Clinic {
+public class Clinic {
     /** Список клиентов клиники */
     private final Set<Client> clients = new HashSet<Client>();
     /** Список питомцев в клинике */
@@ -22,9 +22,8 @@ class Clinic {
     /** Список всех доступных видом животных */
     private final HashMap<String, Class> availablePets = new HashMap<String, Class>();
 
-
     /** Конструктор */
-    Clinic() {
+    public Clinic() {
         this.loadNewOperation("quit", new QuitOperation());
         this.loadNewOperation("addnewclient", new AddNewClientOperation());
         this.loadNewOperation("addnewpet", new AddNewPetOperation());
@@ -46,12 +45,13 @@ class Clinic {
 
     /**
      * Выполняет операцию
-     * @param words Слова
+     * @param s Текст запроса
      * @return Текс или сообщение
      * @throws MyException Различные исключения
      */
-    public String doOperation(String[] words) throws MyException {
+    public String doOperation(String s) throws MyException {
         String message = "";
+        String[] words = s.split(" ");
         if (availableOperations.containsKey(words[0])) {
             message = availableOperations.get(words[0]).doOperation(words);
         }
@@ -77,46 +77,14 @@ class Clinic {
     }
 
     /**
-     * Проверяет, не используется ли уже такое имя клиента
-     * @param name Имя клиента
-     * @return Валидность имени
-     */
-    private boolean isThisClientNameAlreadyExists(String name){
-        boolean result = false;
-        for (Client client : clients) {
-            if (client.getName().equals(name)) {
-                result = true;
-                break;
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Проверяет, не используется ли уже такое имя питомца
-     * @param name Имя питомца
-     * @return Валидность имени
-     */
-    private boolean isThisPetNameAlreadyExists(String name){
-        boolean result = false;
-        for (Pet pet : pets) {
-            if (pet.getName().equals(name)) {
-                result = true;
-                break;
-            }
-        }
-        return result;
-    }
-
-    /**
      * Возвращает клиента по имени
-     * @param id Идентификационный номер клиента
+     * @param name Имя клиента
      * @return Клиента или null, если такого клиента нету
      */
-    private Client getClient(int id) throws ClientDoesntExistException {
+    public Client getClient(String name) throws ClientDoesntExistException {
         Client result = null;
         for (Client client : clients) {
-            if (client.getId() == id) {
+            if (client.getName().equals(name)) {
                 result = client;
                 break;
             }
@@ -127,13 +95,13 @@ class Clinic {
 
     /**
      * Возвращает питомца по имени
-     * @param id Идентификационный номер питомца
+     * @param name Имя питомца
      * @return Клиента или null, если такого клиента нету
      */
-    private Pet getPet(int id) throws PetDoesntExistException {
+    public Pet getPet(String name) throws PetDoesntExistException {
         Pet result = null;
         for (Pet pet : pets) {
-            if (pet.getId() == id) {
+            if (pet.getName().equals(name)) {
                 result = pet;
                 break;
             }
@@ -157,6 +125,17 @@ class Clinic {
         }
         return id;
     }
+
+    /** Геттеры */
+    public Set<Client> getClients() {
+        return clients;
+    }
+
+    public Set<Pet> getPets() {
+        return pets;
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Операция завершения работы
@@ -189,12 +168,15 @@ class Clinic {
             if (!(words.length == 2)) throw new IncorrectDataEntryException();
 
             String name = words[1];
-            if (Clinic.this.isThisClientNameAlreadyExists(name)) throw new ThisClientNameAlreadyExistsException();
 
             Client client = new Client(name);
-            clients.add(client);
 
-            return "New client is successfully added! id = " + client.getId();
+            if (Clinic.this.clients.contains(client)) throw new ThisClientNameAlreadyExistsException();
+
+            clients.add(client);
+            clients.notifyAll();
+
+            return "New client is successfully added!";
         }
     }
 
@@ -213,16 +195,15 @@ class Clinic {
             Client client;
             if (words[1].equals("null")) client = null;
             else {
-                int clientId = Clinic.this.parseInt(words[1]);
-                client = Clinic.this.getClient(clientId);
+                client = Clinic.this.getClient(words[1]);
             }
-            if (!clients.contains(client)) throw new ClientDoesntExistException();
+            clients.notifyAll();
+
 
             String petType = words[2];
             if (!availablePets.containsKey(petType)) throw new UnknownPetTypeException();
 
             String petName = words[3];
-            if (Clinic.this.isThisPetNameAlreadyExists(petName)) throw new ThisPetNameAlreadyExistsException();
 
             Pet pet = null;
             try {
@@ -232,10 +213,15 @@ class Clinic {
                 System.out.println("Unknown constructor!");
             }
 
-            pets.add(pet);
-            client.addPet(pet);
 
-            return "New pet is successfully added! id = " + pet.getId();
+            if (Clinic.this.pets.contains(pet)) throw new ThisPetNameAlreadyExistsException();
+            Clinic.this.pets.add(pet);
+            pets.notifyAll();
+
+            if (client != null) client.addPet(pet);
+            clients.notifyAll();
+
+            return "New pet is successfully added!";
         }
     }
 
@@ -251,8 +237,13 @@ class Clinic {
         public String doOperation(String[] words) throws MyException {
             if (words.length != 2) throw new IncorrectDataEntryException();
 
-            int clientId = Clinic.this.parseInt(words[1]);
-            Client client = Clinic.this.getClient(clientId);
+            String name = words[1];
+            Client client = Clinic.this.getClient(name);
+
+            for (Pet pet : pets) {
+                pet.setOwner(null);
+            }
+
             clients.remove(client);
 
             return "Client is successfully removed!";
@@ -271,8 +262,7 @@ class Clinic {
         public String doOperation(String[] words) throws MyException {
             if (words.length != 2) throw new IncorrectDataEntryException();
 
-            int petId = Clinic.this.parseInt(words[1]);
-            Pet pet = Clinic.this.getPet(petId);
+            Pet pet = Clinic.this.getPet(words[1]);
 
             if (pet != null && pet.getOwner() != null) pet.getOwner().removePet(pet);
             pets.remove(pet);
@@ -282,7 +272,7 @@ class Clinic {
     }
 
     /**
-     * Операция поиска клиента питомца
+     * Операция поиска хозяина питомца
      */
     private class FindClientByPetName implements Operation {
 
@@ -296,8 +286,7 @@ class Clinic {
             if (words.length != 2) throw new IncorrectDataEntryException();
 
             String clientName = "nobody";
-            int petId = Clinic.this.parseInt(words[1]);
-            Pet pet = Clinic.this.getPet(petId);
+            Pet pet = Clinic.this.getPet(words[1]);
             if (pet.getOwner() != null) clientName = pet.getOwner().getName();
 
             return clientName;
@@ -305,7 +294,7 @@ class Clinic {
     }
 
     /**
-     * Опирация поиска хозяина питомца
+     * Опирация поиска питосцев клиента
      */
     private class FindPetsByClientName implements Operation {
 
@@ -319,13 +308,12 @@ class Clinic {
             if (words.length != 2) throw new IncorrectDataEntryException();
 
             String petsNames = "nobody";
-            int clientId = Clinic.this.parseInt(words[1]);
-            Client client = Clinic.this.getClient(clientId);
+            Client client = Clinic.this.getClient(words[1]);
             Set<Pet> clientPets = client.getPets();
             if (clientPets.size() != 0) {
                 petsNames = "";
                 for (Pet pet : clientPets) {
-                    petsNames += (pet.getName() + "\n");
+                    petsNames += (pet.getPetType() + " " + pet.getName() + "\n");
                 }
             }
 
@@ -347,8 +335,7 @@ class Clinic {
         public String doOperation(String[] words) throws MyException {
             if (words.length != 3) throw new IncorrectDataEntryException();
 
-            int clientId = Clinic.this.parseInt(words[1]);
-            Client client = Clinic.this.getClient(clientId);
+            Client client = Clinic.this.getClient(words[1]);
             client.setName(words[2]);
 
             return "Name successfully changed!";
@@ -369,8 +356,7 @@ class Clinic {
         public String doOperation(String[] words) throws MyException {
             if (words.length != 3) throw new IncorrectDataEntryException();
 
-            int petId = Clinic.this.parseInt(words[1]);
-            Pet pet = Clinic.this.getPet(petId);
+            Pet pet = Clinic.this.getPet(words[1]);
             pet.setName(words[2]);
 
             return "Name successfully changed!";
@@ -408,7 +394,7 @@ class Clinic {
          */
         public String doOperation(String[] words) throws MyException {
             String result = "";
-            for (Pet pet : pets) result += pet.toString() + "\n" + "\n";
+            for (Pet pet : pets) result += pet.toString() + "\n";
             return result;
         }
     }
@@ -427,8 +413,7 @@ class Clinic {
         public String doOperation(String[] words) throws MyException {
             if (words.length != 2) throw new IncorrectDataEntryException();
 
-            int clientId = Clinic.this.parseInt(words[1]);
-            Client client = Clinic.this.getClient(clientId);
+            Client client = Clinic.this.getClient(words[1]);
 
             return client.toString();
         }
@@ -448,8 +433,7 @@ class Clinic {
         public String doOperation(String[] words) throws MyException {
             if (words.length != 2) throw new IncorrectDataEntryException();
 
-            int petId = Clinic.this.parseInt(words[1]);
-            Pet pet = Clinic.this.getPet(petId);
+            Pet pet = Clinic.this.getPet(words[1]);
 
             return pet.toString();
         }

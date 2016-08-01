@@ -1,7 +1,7 @@
 package ru.vetclinic.clinic.Pets;
 
-import ru.vetclinic.clinic.Client;
-import ru.vetclinic.clinic.IDGenerator;
+import ru.vetclinic.clinic.Main.Client;
+import ru.vetclinic.clinic.Temperal.IDGenerator;
 
 /**
  * Абстрактный класс Животное, реализующий методы интерфеса Питомец
@@ -75,7 +75,23 @@ abstract class Animal implements Pet {
 
     @Override
     public String toString() {
-        return "id = " + id + ", petType = " + petType + ", name = " + name + ", owner = " +
-                (owner == null ? "null" : owner.getId());
+        return "petType = " + petType + ", name = " + name + ", owner = " +
+                (owner == null ? "null" : owner.getName());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Animal)) return false;
+
+        Animal animal = (Animal) o;
+
+        return getName().equals(animal.getName());
+
+    }
+
+    @Override
+    public int hashCode() {
+        return getName().hashCode();
     }
 }

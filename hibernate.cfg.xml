@@ -11,7 +11,7 @@
         <property name="connection.password">1234</property>
         <property name="hbm2ddl.auto">create</property>
 
-        <mapping class="ru.vetclinic.clinic.Client"/>
+        <mapping class="ru.vetclinic.clinic.Main.Client"/>
 
     </session-factory>
 </hibernate-configuration>

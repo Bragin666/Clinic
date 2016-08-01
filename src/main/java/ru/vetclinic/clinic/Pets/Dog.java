@@ -1,6 +1,6 @@
 package ru.vetclinic.clinic.Pets;
 
-import ru.vetclinic.clinic.Client;
+import ru.vetclinic.clinic.Main.Client;
 
 /**
  * Домашняя собака

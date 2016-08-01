@@ -1,4 +1,4 @@
-package ru.vetclinic.clinic;
+package ru.vetclinic.clinic.Temperal;
 
 /**
  * Генератор Id
